@@ -20,6 +20,7 @@ import {
   X,
   Users,
   MessageSquare,
+  Database,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -83,6 +84,11 @@ const sidebarNavItems = [
     title: "Queries",
     href: "/dashboard/queries",
     icon: MessageSquare,
+  },
+  {
+    title: "Database",
+    href: "/dashboard/database",
+    icon: Database,
   },
 ];
 
