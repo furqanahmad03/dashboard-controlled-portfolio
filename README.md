@@ -220,7 +220,7 @@ The existing schema was created for one managed portfolio. Some portfolio record
 
 - Email: [hfurqan.se@gmail.com](mailto:hfurqan.se@gmail.com)
 - Bugs and ideas: [GitHub Issues](https://github.com/furqanahmad03/dashboard-controlled-portfolio/issues)
-- Published portfolio: [furqanahmad.netlify.app](https://furqanahmad.me)
+- Published portfolio: [furqanahmad.me](https://furqanahmad.me)
 
 ## License
 
