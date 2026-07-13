@@ -1,0 +1,50 @@
+export interface User {
+  id: string
+  name: string
+  email?: string
+  emailVerified?: Date
+  image?: string
+  bio?: string
+  location?: string
+  website?: string
+  github?: string
+  stackoverflow?: string
+  linkedin?: string
+  twitter?: string
+  instagram?: string
+  youtube?: string
+  facebook?: string
+  joinDate?: Date
+  experience?: string
+  skills?: string[]
+  role?: string
+  achievements?: string[]
+  
+  // Additional profile fields
+  phone?: string
+  whatsapp?: string
+  profession?: string
+  industry?: string
+  company?: string
+  designation?: string
+  education?: string
+  university?: string
+  graduationYear?: string
+  dateOfBirth?: Date
+  nationality?: string
+  languages?: string[]
+  behance?: string
+  dribbble?: string
+  medium?: string
+  devto?: string
+  hashnode?: string
+  substack?: string
+  portfolio?: string
+  blog?: string
+  resume?: string
+  availability?: string
+  remoteWork?: boolean
+  relocation?: boolean
+  createdAt?: Date
+  updatedAt?: Date
+} 

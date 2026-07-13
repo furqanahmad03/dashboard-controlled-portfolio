@@ -1,0 +1,381 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String?   @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  bio           String?
+  location      String?
+  website       String?
+  github        String?
+  stackoverflow String?
+  linkedin      String?
+  twitter       String?
+  instagram     String?
+  youtube       String?
+  facebook      String?
+
+  // Additional profile fields
+  joinDate     String? // Format: "Month YYYY" (e.g., "January 2023")
+  experience   String? // Format: "X+ years" (e.g., "5+ years")
+  skills       String[] // Array of skills and technologies
+  role         String? // Professional role/title (e.g., "Senior Full-Stack Developer")
+  achievements String[] // Array of achievements and recognition
+
+  // Contact information
+  phone    String? // Phone number
+  whatsapp String? // WhatsApp number
+
+  // Professional details
+  profession  String? // Primary profession (e.g., "Software Developer")
+  industry    String? // Industry sector (e.g., "Technology", "Healthcare")
+  company     String? // Current company
+  designation String? // Current designation
+
+  // Education summary
+  education      String? // Highest education level
+  university     String? // University/Institution name
+  graduationYear String? // Graduation year
+
+  // Personal details
+  dateOfBirth String? // Date of birth
+  nationality String? // Nationality
+  languages   String[] // Languages spoken
+
+  // Social & professional networks
+  behance  String? // Behance portfolio
+  dribbble String? // Dribbble portfolio
+  medium   String? // Medium blog
+  devto    String? // Dev.to profile
+  hashnode String? // Hashnode blog
+  substack String? // Substack newsletter
+
+  // Additional websites
+  portfolio String? // Portfolio website
+  blog      String? // Personal blog
+  resume    String? // Resume/CV link
+
+  // Professional preferences
+  availability String? // Availability status (e.g., "Open to opportunities", "Not looking")
+  remoteWork   Boolean? // Open to remote work
+  relocation   Boolean? // Open to relocation
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  accounts   Account[]
+  sessions   Session[]
+  activities Activity[]
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Education {
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  degree                  String
+  institution             String
+  institutionLogo         String?
+  institutionLogoPublicId String?
+  location                String?
+  startDate               DateTime
+  endDate                 DateTime?
+  description             String?
+  gpa                     String?
+  percentage              String?
+  skills                  String[]
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  projects                Project[]
+}
+
+model Project {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  slug              String            @unique
+  title             String
+  brief             String
+  thumbnail         String
+  thumbnailPublicId String? // Cloudinary public ID for thumbnail
+  images            String[]
+  imagePublicIds    String[] // Array of Cloudinary public IDs for carousel images
+  stack             String[]
+  repository        String?
+  live              String?
+  category          ProjectCategory[]
+  associatedWith    String?           @db.ObjectId
+  overview          String
+  features          String[]
+  status            ProjectStatus
+  startDate         DateTime
+  endDate           DateTime? // Optional for ongoing projects
+  featured          Boolean           @default(false)
+  hasCaseStudy      Boolean           @default(false)
+  isEnabled         Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  // Relations - associatedWith can reference any of these models
+  education     Education?     @relation(fields: [associatedWith], references: [id])
+  company       Company?       @relation(fields: [associatedWith], references: [id])
+  certification Certification? @relation(fields: [associatedWith], references: [id])
+  client        Client?        @relation(fields: [associatedWith], references: [id])
+  blog          Blog?
+}
+
+model Blog {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  title             String
+  brief             String?
+  content           String
+
+  thumbnail         String?
+  thumbnailPublicId String?
+
+  images            String[]
+  imagePublicIds    String[]
+
+  isBlog            Boolean   @default(false)
+  isCaseStudy       Boolean   @default(true)
+
+  state             BlogState @default(DRAFT)
+
+  projectId         String?   @unique @db.ObjectId
+  project           Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  isEnabled         Boolean   @default(true)
+  featured          Boolean   @default(false)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Certification {
+  id                      String              @id @default(auto()) @map("_id") @db.ObjectId
+  logo                    String?
+  certificateLogoPublicId String?
+  title                   String
+  issuer                  String
+  issuerWebsite           String?
+  issueDate               String
+  credentialID            String?
+  credentialURL           String?
+  certificate             String?
+  certificatePublicId     String?
+  status                  CertificationStatus @default(Active)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  projects                Project[]
+
+  @@unique([title, issuer])
+}
+
+model Company {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  logo         String?
+  logoPublicId String?
+  website      String?
+  location     String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  projects     Project[]
+  positions    Position[]
+
+  @@unique([name])
+}
+
+model Position {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  position     String
+  jobType      String // "full-time", "part-time", "contract", "internship", "freelance"
+  company      String    @db.ObjectId
+  joiningDate  DateTime
+  endingDate   DateTime?
+  locationType String // "on-site", "hybrid", "remote"
+  description  String?
+  skills       String[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  companyRef   Company   @relation(fields: [company], references: [id], onDelete: Cascade)
+
+  @@index([company])
+}
+
+model Client {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  phone         String?
+  email         String?
+  city          String?
+  state         String?
+  country       String?
+  sourceName    String? // Name of website from where client was found
+  sourceWebsite String? // URL of the source website
+  company       String? // Company name if applicable
+  industry      String? // Industry sector
+  budget        String? // Project budget range
+  notes         String? // Additional notes about the client
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  projects      Project[]
+}
+
+model ContactQuery {
+  id        String              @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  replies   ContactQueryReply[]
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model ContactQueryReply {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  queryId        String       @db.ObjectId
+  subject        String
+  message        String
+  recipientEmail String
+  senderEmail    String
+  emailMessageId String?
+  createdAt      DateTime     @default(now())
+
+  query ContactQuery @relation(fields: [queryId], references: [id], onDelete: Cascade)
+
+  @@index([queryId])
+  @@index([createdAt])
+}
+
+enum ProjectStatus {
+  Completed
+  InProgress
+  OnHold
+}
+
+enum BlogState {
+  DRAFT
+  ACTIVE
+}
+
+enum ProjectCategory {
+  Web
+  AI
+  Mobile
+  Desktop
+  API
+  Database
+  DevOps
+  Cloud
+  Blockchain
+  IoT
+  Game
+  Ecommerce
+  CMS
+  Dashboard
+  Analytics
+  Security
+  Testing
+  Documentation
+  Scraping
+  Other
+}
+
+enum CertificationStatus {
+  Active
+  Inactive
+  Pending
+  Surrendered
+  Withdrawn
+  Suspended
+  Revoked
+  Expired
+}
+
+enum ActivityType {
+  Created
+  Updated
+  Deleted
+}
+
+enum ActivityEntity {
+  Education
+  Project
+  Certification
+  Profile
+  User
+}
+
+model Activity {
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String         @db.ObjectId
+  type        ActivityType
+  entity      ActivityEntity
+  entityId    String?
+  entityName  String
+  description String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime       @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([entity, entityId])
+}
